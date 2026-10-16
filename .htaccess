@@ -1,0 +1,34 @@
+# ─────────────────────────────────────────────
+#  Apache .htaccess – Root level
+#  Prevents direct access to sensitive dirs
+# ─────────────────────────────────────────────
+
+# Block directory browsing
+Options -Indexes
+
+# Block access to config & src directories
+<IfModule mod_authz_core.c>
+    <DirectoryMatch "^.*(config|src|database).*$">
+        Require all denied
+    </DirectoryMatch>
+</IfModule>
+
+# Redirect HTTP to HTTPS (uncomment in production)
+# RewriteEngine On
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Security headers
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "DENY"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+</IfModule>
+
+# Prevent access to .htaccess, .git, and env files
+<FilesMatch "(\.htaccess|\.git|\.env|composer\.json|tsconfig\.json)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
